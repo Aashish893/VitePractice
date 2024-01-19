@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import {useState, useEffect} from 'react';
 import '../styles/ToDoList.css'
 import deletebuttonImg from '../images/delete-button.png'
 import addButtonImg from '../images/add-button.png'
@@ -10,13 +10,21 @@ interface Tasks {
     text: string;
 }
 
-
 export const ToDoList = () =>{
 
-    const [tasks, setTasks] = useState<Tasks[]>([]);
+    const [tasks, setTasks] = useState<Tasks[]>(
+        JSON.parse(localStorage.getItem('tasks') || '[]') || [{ id: 1, text: 'Sample Task' }]
+    );
     const [newTask, setNewTask] = useState<string>('');
     const [editedTaskText, setEditedTaskText] = useState<string>('');
     const [editedTaskId, setEditedTaskId] = useState<number | null>(null);
+    const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
+
+    useEffect(() => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        const storedCheckedTasks = JSON.parse(localStorage.getItem('checkedTasks') || '[]');
+        setCheckedTasks(storedCheckedTasks);
+    }, [tasks]);
 
     const handleAddTask = () =>{
         if(newTask.trim()!==''){
@@ -39,6 +47,13 @@ export const ToDoList = () =>{
         setTasks(updatedTasks);
         setEditedTaskId(null);
         setEditedTaskText('');
+    };
+
+    const handleCheckboxChange = (taskId: number) =>{
+        const isChecked = checkedTasks.includes(taskId);
+        const updatedCheckedTasks = isChecked ? checkedTasks.filter(id => id !== taskId) : [...checkedTasks, taskId];
+        setCheckedTasks(updatedCheckedTasks);
+        localStorage.setItem('checkedTasks', JSON.stringify(updatedCheckedTasks));
     };
 
     return(
@@ -70,7 +85,7 @@ export const ToDoList = () =>{
                                 </>
                             ) : (
                                 <>
-                                <p className='task-name'>{task.text}</p>
+                                <p className='task-name' data-checked={checkedTasks.includes(task.id).toString()}>{task.text}</p>
                                 <button
                                     className='delete-button'
                                     onClick={() => handleDeletTask(task.id)}
@@ -90,6 +105,8 @@ export const ToDoList = () =>{
                             className='completion-checkbox'
                             type='checkbox'
                             id={`customCheckbox_${task.id}`}
+                            checked={checkedTasks.includes(task.id)}
+                            onChange={() => handleCheckboxChange(task.id)}
                         />
                     </div>
                 ))}
