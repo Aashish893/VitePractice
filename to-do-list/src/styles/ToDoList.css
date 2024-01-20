@@ -170,3 +170,12 @@
 .completion-checkbox:checked {
     background-color: green 
 }
+
+.note-section{
+    margin-bottom: 10px;
+    background-color: #4caf50;
+    color: white;
+    padding: 5px;
+    border: 1px solid;
+    border-radius: 5px;
+}

@@ -1,24 +1,34 @@
 import {useState, useEffect} from 'react';
 import '../styles/ToDoList.css'
+import NoteDisplay from './NoteDisplay';
+
 import deletebuttonImg from '../images/delete-button.png'
 import addButtonImg from '../images/add-button.png'
 import editButtonImg from '../images/edit-button.png'
 import saveButtonImg from '../images/save-button.png'
+import noteButtonImg from '../images/note-button.png'
 
 interface Tasks {
     id: number;
     text: string;
+    note?: string;
+    showNote?: boolean;
 }
 
 export const ToDoList = () =>{
 
     const [tasks, setTasks] = useState<Tasks[]>(
-        JSON.parse(localStorage.getItem('tasks') || '[]') || [{ id: 1, text: 'Sample Task' }]
+        JSON.parse(localStorage.getItem('tasks') || '[]') || [{ id: 1, text: 'Sample Task',note: 'Sample Note'  }]
     );
     const [newTask, setNewTask] = useState<string>('');
     const [editedTaskText, setEditedTaskText] = useState<string>('');
     const [editedTaskId, setEditedTaskId] = useState<number | null>(null);
     const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
+    const [editedTaskNote, setEditedTaskNote] = useState<string>('');
+
+    const [displayedNote, setDisplayedNote] = useState<string>('');
+    const [displayNote, setDisplayNote] = useState<boolean>(false);
+
 
     useEffect(() => {
         localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -38,15 +48,18 @@ export const ToDoList = () =>{
         setTasks(updatedTasks);
     };
 
-    const handleEditTask = (taskId:number, taskText : string) => {
+    const handleEditTask = (taskId:number, taskText : string, taskNote?: string) => {
+        
         setEditedTaskId(taskId);
         setEditedTaskText(taskText);
+        setEditedTaskNote(taskNote || '');
     };
     const handleSaveTask = () =>{
-        const updatedTasks = tasks.map((task) =>task.id === editedTaskId ? { ...task, text: editedTaskText } : task);
+        const updatedTasks = tasks.map((task) =>task.id === editedTaskId ? { ...task, text: editedTaskText,note: editedTaskNote } : task);
         setTasks(updatedTasks);
         setEditedTaskId(null);
         setEditedTaskText('');
+        setEditedTaskNote('');
     };
 
     const handleCheckboxChange = (taskId: number) =>{
@@ -54,6 +67,25 @@ export const ToDoList = () =>{
         const updatedCheckedTasks = isChecked ? checkedTasks.filter(id => id !== taskId) : [...checkedTasks, taskId];
         setCheckedTasks(updatedCheckedTasks);
         localStorage.setItem('checkedTasks', JSON.stringify(updatedCheckedTasks));
+    };
+
+    const handleAddNote = (taskId: number) => {
+        setEditedTaskId(taskId);
+        setEditedTaskText(tasks.find(task => task.id === taskId)?.text || '');
+        setEditedTaskNote(''); // Initialize edited task note for a new note
+    };
+
+
+    const handleDisplayNote = (taskId: number) => {
+        const task = tasks.find((task) => task.id === taskId);
+        if (task) {
+            setDisplayedNote(task.note || '');
+            setDisplayNote(true);
+        }
+    };
+    
+    const handleCloseNote = () => {
+        setDisplayNote(false);
     };
 
     return(
@@ -79,6 +111,11 @@ export const ToDoList = () =>{
                                     value={editedTaskText}
                                     onChange={(e) => setEditedTaskText(e.target.value)}
                                 />
+                                <textarea
+                                    value={editedTaskNote}
+                                    onChange={(e) => setEditedTaskNote(e.target.value)}
+                                    placeholder='Enter Task Note'
+                                />
                                 <button  className='save-button' onClick={handleSaveTask}>
                                     <img src={saveButtonImg}/>
                                 </button>
@@ -86,6 +123,17 @@ export const ToDoList = () =>{
                             ) : (
                                 <>
                                 <p className='task-name' data-checked={checkedTasks.includes(task.id).toString()}>{task.text}</p>
+                                {task.note ? (<button className='edit-button' onClick={() => handleDisplayNote(task.id)}>
+                                                <img src={noteButtonImg}/>
+                                            </button>
+                                    ) : (
+                                    <button
+                                        className='edit-button'
+                                        onClick={() => handleAddNote(task.id)}
+                                    >
+                                        <img src={noteButtonImg}/>
+                                    </button>
+                                    )}
                                 <button
                                     className='delete-button'
                                     onClick={() => handleDeletTask(task.id)}
@@ -111,6 +159,9 @@ export const ToDoList = () =>{
                     </div>
                 ))}
                 </div>
+            )}
+            {displayNote && (
+                <NoteDisplay note={displayedNote} onClose={handleCloseNote} />
             )}
         </div>
     );
