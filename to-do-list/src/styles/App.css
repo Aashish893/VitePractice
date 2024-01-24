@@ -3,3 +3,8 @@
   text-align: center;
   margin-bottom: auto;
 }
+
+body {
+  background-color: #1a1a1a; /* Set a dark background color for the entire page */
+  color: #ffffff; /* Set light text color for better visibility on dark background */
+}
