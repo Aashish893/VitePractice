@@ -11,21 +11,23 @@ type QuestionVars = {
 
 const QuestionBox : React.FC<QuestionVars> = ({question,options,userAnswer,questionNumber, callback, totalQuestions}) => 
 (
+    
     <div>
         <p>
             Question : {questionNumber} / {totalQuestions}
         </p>
         <p dangerouslySetInnerHTML={{__html : question}}/>
-        <div>
+        <div >
             {options.map(answer => (
-                <div>
-                    <button disabled= {userAnswer} onClick={callback}>
+                <div key = {answer}>
+                    <button disabled= {userAnswer} onClick={callback} value={answer}>
                         <span dangerouslySetInnerHTML={{__html :answer}}/>
                     </button>
                 </div>
             ))}
         </div>
     </div>
+    
 );
 
 export default QuestionBox;
