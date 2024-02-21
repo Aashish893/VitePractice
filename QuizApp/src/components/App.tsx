@@ -5,6 +5,7 @@ import { fetchQuestions } from './ApiCall';
 import {QuestionCard, Difficulty } from './ApiCall';
 
 type Answers = {
+  question : string;
   answer : string;
   correct : boolean;
   correctAnswer : string;
