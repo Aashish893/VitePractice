@@ -1,10 +1,8 @@
 import React, {useState} from 'react';
-import '../styles/App.css'
 import QuestionBox from './QuestionBox';
-import { fetchQuestions } from './ApiCall';
-import {QuestionCard, Difficulty } from './ApiCall';
-
-type Answers = {
+import { fetchQuestions,QuestionCard, Difficulty } from './ApiCall';
+import { GlobalStyles, Wrapper } from '../styles/App.styles.ts';
+export type Answers = {
   question : string;
   answer : string;
   correct : boolean;
@@ -52,20 +50,27 @@ function App() {
   }
 
   const nextQuestion = () =>{
-
+    const nextQ = number + 1;
+    if(nextQ === TotalQuestions){
+      setQuizEnded(true);
+    }
+    else{
+      setNumber(nextQ);
+    }
   }
 
   return (
     <>
-      <div className='App'>
+      <GlobalStyles/>
+      <Wrapper>
         <h1>Welcome To your Quiz</h1>
         {(quizEnded || userAnswer.length === TotalQuestions) ? (
-            <button className='startButton' onClick={startQuiz}>
+            <button className='start' onClick={startQuiz}>
               Start Your Quiz
             </button>
            ):null }
     
-        {!quizEnded ? <p className='score'>Score:</p> : null}
+        {!quizEnded ? <p className='score'>Score: {score}</p> : null}
         {loading? <p>Loading Questions</p> : null}
         {!loading && !quizEnded && <QuestionBox 
         questionNumber={number + 1}
@@ -76,10 +81,10 @@ function App() {
         callback={checkAnswer}
         />}
         {!loading && !quizEnded && userAnswer.length === number + 1 && number !== TotalQuestions -1 ?
-          (<button className='nextButton' onClick={nextQuestion}>
+          (<button className='next' onClick={nextQuestion}>
         Next Quesion
         </button>) : null }
-      </div>
+      </Wrapper>
     </>
   )
 }

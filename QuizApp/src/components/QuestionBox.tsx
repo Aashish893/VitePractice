@@ -1,32 +1,33 @@
 // import React from "react";
-
+import { Wrapper,ButtonWrapper } from "../styles/QuestionBox.styles.ts";
+import { Answers } from "./App";
 type QuestionVars = {
     question : string;
     options : string[];
-    userAnswer : any;
     questionNumber : number;
     totalQuestions : number;
-    callback : any;
+    callback : (e : React.MouseEvent<HTMLButtonElement>)=>void ;
+    userAnswer : Answers | undefined;
 }
 
 const QuestionBox : React.FC<QuestionVars> = ({question,options,userAnswer,questionNumber, callback, totalQuestions}) => 
 (
     
-    <div>
+    <Wrapper>
         <p>
             Question : {questionNumber} / {totalQuestions}
         </p>
         <p dangerouslySetInnerHTML={{__html : question}}/>
         <div >
             {options.map(answer => (
-                <div key = {answer}>
-                    <button disabled= {userAnswer} onClick={callback} value={answer}>
+                <ButtonWrapper key = {answer} correct = {userAnswer?.correctAnswer === answer} userClicked = {userAnswer?.answer === answer}>
+                    <button disabled= {!!userAnswer} onClick={callback} value={answer}>
                         <span dangerouslySetInnerHTML={{__html :answer}}/>
                     </button>
-                </div>
+                </ButtonWrapper>
             ))}
         </div>
-    </div>
+    </Wrapper>
     
 );
 
